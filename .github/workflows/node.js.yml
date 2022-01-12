@@ -37,3 +37,6 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "travelmaker-api"
           heroku_email: "marcin.dobroszek@gmail.com"
+        env:
+          HD_DATABASE: ${{ secrets.DATABASE }}
+          HD_PORT: 80
