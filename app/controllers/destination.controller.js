@@ -1,9 +1,13 @@
 const Destination = require('../db/models/destination.model')
 
 exports.create = (req, res) => {
-  Destination.create(req.body)
-    .then(data => res.status(201).json({data}))
-    .catch(e => res.status(400).json({details: e.errors || {}, message: e.message || 'Some error occurred while creating the Destination.'}))
+  Destination.count().exec()
+    .then((count) => {
+      Destination.create({...req.body, order: count})
+        .then(data => res.status(201).json({data}))
+        .catch(e => res.status(400).json({details: e.errors || {}, message: e.message || 'Some error occurred while creating the Destination.'}))
+    })
+    .catch(e => res.status(400).json({message: e.message || 'Some error occurred while creating the Destination.'}))
 }
 
 exports.readAll = (_, res) => {
