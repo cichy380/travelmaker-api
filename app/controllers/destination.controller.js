@@ -1,3 +1,4 @@
+const async = require('async')
 const Destination = require('../db/models/destination.model')
 
 exports.create = (req, res) => {
@@ -28,6 +29,26 @@ exports.update = (req, res) => {
   Destination.findByIdAndUpdate(id, req.body, {returnDocument: 'after'})
     .then(data => data ? res.status(200).json({data}) : res.status(404).json({message: `Not found Destination with id ${id}.`}))
     .catch(e => res.status(400).json({message: e.reason?.toString() || e.message || `Error updating Destination with id ${id}.`}))
+}
+
+exports.changeOrder = (req, res) => {
+  const {order} = req.body
+  Destination.find({ _id: { $in: order }})
+    .then(data => {
+      if (data && data.length === order.length) {
+        async.series([
+          (done) => {
+              async.each(data, (destination, callback) => {
+                destination.order = order.indexOf(destination.id)
+                destination.save(callback)
+              }, done)
+          },
+        ], () => res.status(200).json({data}))
+      } else {
+        res.status(404).json({message: `Not found all Destinations.`})
+      }
+    })
+    .catch(e => res.status(400).json({message: e.reason?.toString() || e.message || `Error retrieving Destination with ids ${order}.`, details: e.details}))
 }
 
 exports.delete = (req, res) => {

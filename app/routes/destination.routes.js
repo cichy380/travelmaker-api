@@ -7,6 +7,7 @@ router.get('/destinations/:id', destinations.readOne)
 router.post('/destinations', destinations.create)
 router.put('/destinations/:id', destinations.update)
 router.delete('/destinations/:id', destinations.delete)
+router.patch('/destinations', destinations.changeOrder)
 router.get('*', (req, res) => res.status(400).json({message: 'Endpoint does not exist.'}))
 
 module.exports = router
