@@ -1,4 +1,3 @@
-const async = require('async')
 const Destination = require('../db/models/destination.model')
 
 exports.create = (req, res) => {
@@ -6,7 +5,10 @@ exports.create = (req, res) => {
     .then((count) => {
       Destination.create({...req.body, order: count})
         .then(data => res.status(201).json({data}))
-        .catch(e => res.status(400).json({details: e.errors || {}, message: e.message || 'Some error occurred while creating the Destination.'}))
+        .catch(e => res.status(400).json({
+          details: e.errors || {},
+          message: e.message || 'Some error occurred while creating the Destination.'
+        }))
     })
     .catch(e => res.status(400).json({message: e.message || 'Some error occurred while creating the Destination.'}))
 }
@@ -33,21 +35,15 @@ exports.update = (req, res) => {
 
 exports.changeOrder = (req, res) => {
   const {order} = req.body
-  Destination.find({ _id: { $in: order }})
-    .then(data => {
-      if (data && data.length === order.length) {
-        async.series([
-          (done) => {
-              async.each(data, (destination, callback) => {
-                destination.order = order.indexOf(destination.id)
-                destination.save(callback)
-              }, done)
-          },
-        ], () => res.status(200).json({data}))
-      } else {
-        res.status(404).json({message: `Not found all Destinations.`})
-      }
+  const data = [] // response data
+
+  Destination.find({_id: {$in: order}}).cursor()
+    .eachAsync(async (destination) => {
+      destination.order = order.indexOf(destination.id)
+      data.push(destination)
+      await destination.save()
     })
+    .then(() => res.status(200).json({data}))
     .catch(e => res.status(400).json({message: e.reason?.toString() || e.message || `Error retrieving Destination with ids ${order}.`, details: e.details}))
 }
 
