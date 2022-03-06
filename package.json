@@ -1,6 +1,6 @@
 {
   "name": "travelmaker-api",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "API for Travelmaker application",
   "scripts": {
     "start": "node app/index.js",
