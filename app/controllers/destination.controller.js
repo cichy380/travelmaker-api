@@ -28,7 +28,7 @@ exports.readOne = (req, res) => {
 
 exports.update = (req, res) => {
   const {id} = req.params
-  Destination.findByIdAndUpdate(id, req.body, {returnDocument: 'after'})
+  Destination.findByIdAndUpdate(id, req.body, {runValidators: true, returnDocument: 'after'})
     .then(data => data ? res.status(200).json({data}) : res.status(404).json({message: `Not found Destination with id ${id}.`}))
     .catch(e => res.status(400).json({message: e.reason?.toString() || e.message || `Error updating Destination with id ${id}.`}))
 }
